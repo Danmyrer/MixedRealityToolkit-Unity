@@ -129,7 +129,7 @@ if (www.isNetworkError || www.isHttpError)
             }
 
             string filePath = storage.ConfigFilePath;
-            string fileName = storage.ConfigFilePath.Split("\\")[^1];
+            string fileName = Path.GetFileName(filePath);
 
             string base64 = null;
             if (File.Exists(filePath))

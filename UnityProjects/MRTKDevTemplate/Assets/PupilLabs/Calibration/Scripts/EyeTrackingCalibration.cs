@@ -42,6 +42,23 @@ namespace PupilLabs.Calibration
         {
             outUi.SetActive(false);
 
+            if (gazeDataProvider == null)
+            {
+                gazeDataProvider = ServiceLocator.Instance.GazeDataProvider;
+            }
+            if (storage == null)
+            {
+                storage = ServiceLocator.Instance.GetComponentInChildren<DataStorage>(true);
+            }
+            calibrationFinished.AddListener(gazeDataProvider.SetGazeOrigin);
+            calibrationTargets = targets.GetComponentsInChildren<CalibrationTarget>();
+
+            foreach (CalibrationTarget t in calibrationTargets)
+            {
+                t.gameObject.SetActive(false);
+            }
+            calibrationTargets[currentTargetId].gameObject.SetActive(true);
+
             yield return StartCoroutine(studyServer.Connect(result =>
                 {
                 },
@@ -60,23 +77,6 @@ namespace PupilLabs.Calibration
                     Debug.LogError($"[StudyServer] Error: {error}");
                 })
             );
-
-            if (gazeDataProvider == null)
-            {
-                gazeDataProvider = ServiceLocator.Instance.GazeDataProvider;
-            }
-            if (storage == null)
-            {
-                storage = ServiceLocator.Instance.GetComponentInChildren<DataStorage>(true);
-            }
-            calibrationFinished.AddListener(gazeDataProvider.SetGazeOrigin);
-            calibrationTargets = targets.GetComponentsInChildren<CalibrationTarget>();
-
-            foreach (CalibrationTarget t in calibrationTargets)
-            {
-                t.gameObject.SetActive(false);
-            }
-            calibrationTargets[currentTargetId].gameObject.SetActive(true);
         }
 
         private IEnumerator ShowNextRoutine()
@@ -124,12 +124,45 @@ namespace PupilLabs.Calibration
 
         public void TriggerSave()
         {
-            Save().Forget();
+            StartCoroutine(SaveRoutine());
         }
 
         public void TriggerResetDefaults()
         {
             ResetDefaults().Forget();
+        }
+
+        private IEnumerator SaveRoutine()
+        {
+            if (!canSave) yield break;
+            canSave = false;
+
+            var whenReady = storage.WhenReady();
+            while (!whenReady.IsCompleted) yield return null;
+
+            AppConfig config = storage.Config;
+            config.sensorCalibration.offset.position.x = solvedPosition.x;
+            config.sensorCalibration.offset.position.y = solvedPosition.y;
+            config.sensorCalibration.offset.position.z = solvedPosition.z;
+            config.sensorCalibration.offset.rotation.x = solvedRotation.eulerAngles.x;
+            config.sensorCalibration.offset.rotation.y = solvedRotation.eulerAngles.y;
+            config.sensorCalibration.offset.rotation.z = solvedRotation.eulerAngles.z;
+
+            var writeTask = File.WriteAllTextAsync(storage.ConfigFilePath, JsonUtility.ToJson(storage.Config, true));
+            while (!writeTask.IsCompleted) yield return null;
+
+            var msg = "hallo";
+            yield return StartCoroutine(studyServer.PutFile(storage,
+                success => { },
+                error =>
+                {
+                    msg = error;
+                    Debug.LogError($"[StudyServer] Error: {error}");
+                }));
+
+            outTxt.SetText(msg);
+            //outTxt.SetText("Calibration uploaded to Study-Server");
+            canSave = true;
         }
 
         public async Task Save()
@@ -141,6 +174,7 @@ namespace PupilLabs.Calibration
             canSave = false;
 
             await storage.WhenReady();
+
             AppConfig config = storage.Config;
             config.sensorCalibration.offset.position.x = solvedPosition.x;
             config.sensorCalibration.offset.position.y = solvedPosition.y;
@@ -151,19 +185,17 @@ namespace PupilLabs.Calibration
 
             await File.WriteAllTextAsync(storage.ConfigFilePath, JsonUtility.ToJson(config, true));
 
-            // Upload File to StudyServer
-            StartCoroutine(studyServer.PutFile(storage, success =>
+            var msg = "hallo";
+            StartCoroutine(studyServer.PutFile(storage, success => { }, error =>
             {
-                Debug.Log($"Saved to: {storage.ConfigFilePath}");
-            },
-            error =>
-            {
-                Debug.Log($"Upload-Error: {error}");
+                msg = error;
+                Debug.LogError($"[StudyServer] Error: {error}");
             }));
 
             //outTxt.SetText($"Saved to: {storage.ConfigFilePath}");
-            outTxt.SetText($"Calibration uploaded to Study-Server");
-            
+            //outTxt.SetText($"Calibration uploaded to Study-Server");
+            outTxt.SetText(msg);
+
             canSave = true;
         }
 
