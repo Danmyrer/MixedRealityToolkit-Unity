@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -401,6 +400,63 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 92009d37c15e76a47aec4e4690982b47, type: 3}
+--- !u!1001 &1039491753
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 289805705971424592, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 289805705971424592, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 289805705971424592, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 289805705971424592, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 289805705971424592, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 289805705971424592, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 289805705971424592, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 289805705971424592, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 289805705971424592, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 289805705971424592, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 289805705971424592, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 289805705971424595, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
+      propertyPath: m_Name
+      value: MRTK NeonXR Variant
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9272c676bfeb257429afdd18b7c0f981, type: 3}
 --- !u!1001 &1124666832
 PrefabInstance:
   m_ObjectHideFlags: 0
