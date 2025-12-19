@@ -18,6 +18,12 @@ namespace PupilLabs.Calibration
         public string id;
     }
 
+    [Serializable]
+    public class UploadModel
+    {
+        public string file;
+    }
+
     public class StudyServerConnector : MonoBehaviour
     {
         [Header("HTTP")]
@@ -106,6 +112,7 @@ if (www.isNetworkError || www.isHttpError)
 
             // hier hast du die UUID vom Server
             LastParticipantId = response.id;
+            Debug.Log($"Last participant id: {LastParticipantId}");
             onSuccess?.Invoke(response.id);
         }
 
@@ -122,24 +129,27 @@ if (www.isNetworkError || www.isHttpError)
             }
 
             string filePath = storage.ConfigFilePath;
+            string fileName = storage.ConfigFilePath.Split("\\")[^1];
 
+            string base64 = null;
             if (File.Exists(filePath))
             {
                 byte[] fileBytes = File.ReadAllBytes(filePath);
-                string base64 = System.Convert.ToBase64String(fileBytes);
+                base64 = Convert.ToBase64String(fileBytes);
             }
             else
             {
                 Debug.LogError($"File not found: {filePath}");
             }
 
-            var url = $"{BaseUrl}/study/participant/id/{LastParticipantId}/file/test.json";
+            var url = $"{BaseUrl}/study/participant/id/{LastParticipantId}/file/{fileName}";
+            Debug.Log($"Upload url: {url}");
 
-            var form = new List<IMultipartFormSection>
-            {
-                new MultipartFormDataSection("file", filePath)
-            };
-            UnityWebRequest www = UnityWebRequest.Post(url, form);
+            var form = new UploadModel { file = base64 };
+            var jsonData = JsonUtility.ToJson(form);
+
+            UnityWebRequest www = UnityWebRequest.Put(url, jsonData);
+            www.SetRequestHeader("Content-Type", "application/json");
 
             yield return www.SendWebRequest();
 

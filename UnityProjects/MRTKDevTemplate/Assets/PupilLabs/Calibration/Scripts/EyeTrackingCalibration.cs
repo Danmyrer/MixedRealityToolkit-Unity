@@ -35,12 +35,15 @@ namespace PupilLabs.Calibration
 
         private void Start()
         {
+            StartCoroutine(StartCalibration());
+        }
+
+        private IEnumerator StartCalibration()
+        {
             outUi.SetActive(false);
 
-            var success = false;
-            StartCoroutine(studyServer.Connect(result =>
+            yield return StartCoroutine(studyServer.Connect(result =>
                 {
-                    success = true;
                 },
                 error =>
                 {
@@ -48,7 +51,7 @@ namespace PupilLabs.Calibration
                 })
             );
 
-            StartCoroutine(studyServer.PostParticipant(uuid =>
+            yield return StartCoroutine(studyServer.PostParticipant(uuid =>
                 {
                     Debug.Log($"[StudyServer] New Participant: {uuid}");
                 },
@@ -148,7 +151,19 @@ namespace PupilLabs.Calibration
 
             await File.WriteAllTextAsync(storage.ConfigFilePath, JsonUtility.ToJson(config, true));
 
-            outTxt.SetText($"Saved to: {storage.ConfigFilePath}");
+            // Upload File to StudyServer
+            StartCoroutine(studyServer.PutFile(storage, success =>
+            {
+                Debug.Log($"Saved to: {storage.ConfigFilePath}");
+            },
+            error =>
+            {
+                Debug.Log($"Upload-Error: {error}");
+            }));
+
+            //outTxt.SetText($"Saved to: {storage.ConfigFilePath}");
+            outTxt.SetText($"Calibration uploaded to Study-Server");
+            
             canSave = true;
         }
 
