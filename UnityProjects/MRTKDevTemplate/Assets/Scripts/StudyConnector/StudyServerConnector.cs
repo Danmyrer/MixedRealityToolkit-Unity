@@ -6,6 +6,8 @@ using UnityEngine.Networking;
 
 namespace PupilLabs.Calibration
 {
+    using Serializable;
+    using System.IO;
     using System.Net;
     using System.Net.Sockets;
     using System.Text;
@@ -105,6 +107,51 @@ if (www.isNetworkError || www.isHttpError)
             // hier hast du die UUID vom Server
             LastParticipantId = response.id;
             onSuccess?.Invoke(response.id);
+        }
+
+        public IEnumerator PutFile(DataStorage storage, Action<string> onSuccess = null, Action<string> onError = null)
+        {
+            if (BaseUrl == null)
+            {
+                Debug.LogError("BaseUrl is missing");
+            }
+
+            if (storage == null)
+            {
+                Debug.LogError("storage is missing");
+            }
+
+            string filePath = storage.ConfigFilePath;
+
+            if (File.Exists(filePath))
+            {
+                byte[] fileBytes = File.ReadAllBytes(filePath);
+                string base64 = System.Convert.ToBase64String(fileBytes);
+            }
+            else
+            {
+                Debug.LogError($"File not found: {filePath}");
+            }
+
+            var url = $"{BaseUrl}/study/participant/id/{LastParticipantId}/file/test.json";
+
+            var form = new List<IMultipartFormSection>
+            {
+                new MultipartFormDataSection("file", filePath)
+            };
+            UnityWebRequest www = UnityWebRequest.Post(url, form);
+
+            yield return www.SendWebRequest();
+
+#if UNITY_2020_2_OR_NEWER
+            if (www.result != UnityWebRequest.Result.Success)
+#else
+        if (www.isNetworkError || www.isHttpError)
+#endif
+            {
+                Debug.LogError($"PostParticipant failed: {www.error}");
+                onError?.Invoke(www.error);
+            }
         }
     }
 }
