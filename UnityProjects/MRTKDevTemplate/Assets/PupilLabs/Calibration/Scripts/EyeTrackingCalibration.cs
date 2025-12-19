@@ -151,7 +151,7 @@ namespace PupilLabs.Calibration
             var writeTask = File.WriteAllTextAsync(storage.ConfigFilePath, JsonUtility.ToJson(storage.Config, true));
             while (!writeTask.IsCompleted) yield return null;
 
-            var msg = "hallo";
+            var msg = "Calibration uploaded to Study-Server";
             yield return StartCoroutine(studyServer.PutFile(storage,
                 success => { },
                 error =>
@@ -161,7 +161,6 @@ namespace PupilLabs.Calibration
                 }));
 
             outTxt.SetText(msg);
-            //outTxt.SetText("Calibration uploaded to Study-Server");
             canSave = true;
         }
 
