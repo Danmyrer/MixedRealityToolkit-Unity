@@ -23,6 +23,8 @@ namespace PupilLabs.Calibration
         [SerializeField]
         private GameObject outUi;
 
+        [SerializeField] public StudyServerConnector studyServer;
+
         public DVector3Event calibrationFinished;
 
         private bool canSave = false;
@@ -34,6 +36,28 @@ namespace PupilLabs.Calibration
         private void Start()
         {
             outUi.SetActive(false);
+
+            var success = false;
+            StartCoroutine(studyServer.Connect(result =>
+                {
+                    success = true;
+                },
+                error =>
+                {
+                    Debug.Log($"[StudyServer] Error: {error}");
+                })
+            );
+
+            StartCoroutine(studyServer.PostParticipant(uuid =>
+                {
+                    Debug.Log($"[StudyServer] New Participant: {uuid}");
+                },
+                error =>
+                {
+                    Debug.LogError($"[StudyServer] Error: {error}");
+                })
+            );
+
             if (gazeDataProvider == null)
             {
                 gazeDataProvider = ServiceLocator.Instance.GazeDataProvider;
